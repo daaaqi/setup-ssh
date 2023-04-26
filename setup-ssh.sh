@@ -14,12 +14,6 @@ then
     apt-get install -y sudo
 fi
 
-# 检查用户是否已经禁用密码登录
-if sudo grep -q "^PasswordAuthentication no" /etc/ssh/sshd_config; then
-  echo "已经禁用密码登录，无需再次操作"
-  exit
-fi
-
 # 获取用户输入的公钥
 echo "请粘贴您的公钥："
 read public_key
@@ -39,6 +33,12 @@ fi
 # 将公钥贴到 authorized_keys 文件中
 sudo mkdir -p ~/.ssh
 echo "$public_key" | sudo tee -a ~/.ssh/authorized_keys > /dev/null
+
+# 检查用户是否已经禁用密码登录
+if sudo grep -q "^PasswordAuthentication no" /etc/ssh/sshd_config; then
+  echo "已经禁用密码登录，无需再次操作"
+  exit
+fi
 
 # 禁用密码登录
 sudo sed -i 's/.*PasswordAuthentication.*/PasswordAuthentication no/g' /etc/ssh/sshd_config
