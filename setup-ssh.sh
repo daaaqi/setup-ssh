@@ -46,5 +46,13 @@ $SUDO sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ss
 $SUDO sed -i 's/#ChallengeResponseAuthentication yes/ChallengeResponseAuthentication no/g' /etc/ssh/sshd_config
 $SUDO systemctl restart sshd
 
-# Step 3: Print completion message
+# Step 3: Check for other SSH public keys in authorized_keys file
+echo "The following email addresses are currently authorized:"
+if [ -f ~/.ssh/authorized_keys ] && [ -s ~/.ssh/authorized_keys ]; then
+    awk '{print $NF}' ~/.ssh/authorized_keys | cut -d "@" -f 2 | sort | uniq
+else
+    echo "No other email addresses are currently authorized."
+fi
+
+# Step 4: Print completion message
 echo "SSH public key has been added and password authentication has been disabled."
