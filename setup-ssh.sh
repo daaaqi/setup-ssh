@@ -29,7 +29,7 @@ echo "Please enter your SSH public key:"
 read ssh_public_key
 
 # Validate SSH public key format
-if [[ ! $ssh_public_key =~ ^ssh-rsa\ [A-Za-z0-9+\/]+[=]{0,3}( [^@]+@[^@]+)?$ ]]; then
+if ! ssh-keygen -l -f <(echo "$ssh_public_key") >/dev/null 2>&1; then
     echo "Invalid SSH public key format. Please enter a valid SSH public key."
     exit 1
 elif [[ -z $ssh_public_key ]]; then
