@@ -1,5 +1,29 @@
 #!/bin/bash
 
+# Check for dependencies and install if missing
+if ! command -v sudo &> /dev/null
+then
+    echo "sudo command not found, installing..."
+    if command -v apt-get &> /dev/null
+    then
+        sudo apt-get update && sudo apt-get install -y sudo
+    elif command -v yum &> /dev/null
+    then
+        sudo yum install -y sudo
+    else
+        echo "Could not find a package manager to install sudo"
+        exit 1
+    fi
+fi
+
+# Determine whether to use sudo or not
+if [ "$(whoami)" == "root" ]
+then
+    SUDO=""
+else
+    SUDO="sudo"
+fi
+
 # Step 1: Add SSH public key
 echo "Please enter your SSH public key:"
 read ssh_public_key
@@ -8,9 +32,10 @@ echo "$ssh_public_key" >> ~/.ssh/authorized_keys
 chmod 600 ~/.ssh/authorized_keys
 
 # Step 2: Disable password authentication
-sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config
-sudo sed -i 's/#ChallengeResponseAuthentication yes/ChallengeResponseAuthentication no/g' /etc/ssh/sshd_config
-sudo systemctl restart sshd
+$SUDO sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config
+$SUDO sed -i 's/#ChallengeResponseAuthentication yes/ChallengeResponseAuthentication no/g' /etc/ssh/sshd_config
+$SUDO systemctl restart sshd
 
 # Step 3: Print completion message
 echo "SSH public key has been added and password authentication has been disabled."
+
