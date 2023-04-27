@@ -6,12 +6,6 @@ if ! command -v ssh >/dev/null 2>&1; then
   sudo apt update && sudo apt install -y openssh-server
 fi
 
-# 检查是否为root用户
-if [ "$EUID" -eq 0 ]; then
-  echo "请不要使用root用户执行脚本！"
-  exit 1
-fi
-
 # 列出已存在的公钥
 existing_keys=$(sudo cat ~/.ssh/authorized_keys)
 if [[ -n "$existing_keys" ]]; then
